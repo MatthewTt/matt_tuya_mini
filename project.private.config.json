@@ -1,0 +1,30 @@
+{
+  "setting": {},
+  "condition": {
+    "plugin": {
+      "list": []
+    },
+    "game": {
+      "list": []
+    },
+    "gamePlugin": {
+      "list": []
+    },
+    "miniprogram": {
+      "list": [
+        {
+          "name": "pages/home_center/common_panel/index",
+          "pathName": "pages/home_center/common_panel/index",
+          "query": "device_id=vdevo161896987399402",
+          "scene": null
+        },
+        {
+          "name": "pages/home_center/device_list/index",
+          "pathName": "pages/home_center/device_list/index",
+          "query": "device_id=vdevo161896987399402",
+          "scene": null
+        }
+      ]
+    }
+  }
+}

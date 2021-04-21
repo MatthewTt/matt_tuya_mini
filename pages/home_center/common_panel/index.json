@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "navbar": "../../../components/t_navbar/index",
+    "Boolean": "./components/Boolean/index",
+    "Enum": "./components/Enum/index",
+    "Integer": "./components/Integer/index",
+    "van-tab": "@vant/weapp/tab/index",
+    "van-tabs": "@vant/weapp/tabs/index"
+  },
+  "navigationStyle": "custom"
+}
