@@ -7,9 +7,9 @@
 <view class="button-block">
   <view class="common-panel-header">
     <view class="heart"></view>
-    <view class="common-panel-header-block">
+    <view class="common-panel-header-block" bindtap="switchTap">
       <text class="device-name">{{titleItem.name}}</text>
-      <text class="open-state">OPEN</text>
+      <text class="open-state">{{ rwDpList.switch.value ? 'CLOSE' : 'OPEN' }}</text>
     </view>
   </view>
 </view>

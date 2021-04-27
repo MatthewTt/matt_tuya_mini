@@ -1,7 +1,11 @@
 // miniprogram/pages/home_center/common_panel/index.js.js
-import { getDevFunctions, getDeviceDetails, deviceControl } from '../../../utils/api/device-api'
+import {
+  getDevFunctions,
+  getDeviceDetails,
+  deviceControl
+} from '../../../utils/api/device-api'
 import wxMqtt from '../../../utils/mqtt/wxMqtt'
-
+import request from "../../../utils/request";
 
 Page({
 
@@ -18,19 +22,26 @@ Page({
     rwDpList: {}, //可上报可下发功能点
     isRoDpListShow: false,
     isRwDpListShow: false,
-    forest: '../../../image/forest@2x.png'
+    forest: '../../../image/forest@2x.png',
+    switchStatus: false
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    const { device_id } = options
-    this.setData({ device_id })
+    const {
+      device_id
+    } = options
+    this.setData({
+      device_id
+    })
 
     // mqtt消息监听
     wxMqtt.on('message', (topic, newVal) => {
-      const { status } = newVal
+      const {
+        status
+      } = newVal
       console.log(newVal)
       this.updateStatus(status)
     })
@@ -40,13 +51,24 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: async function () {
-    const { device_id } = this.data
-    const [{ name, status, icon }, { functions = [] }] = await Promise.all([
+    const {
+      device_id
+    } = this.data
+    const [{
+      name,
+      status,
+      icon
+    }, {
+      functions = []
+    }] = await Promise.all([
       getDeviceDetails(device_id),
       getDevFunctions(device_id),
     ]);
-
-    const { roDpList, rwDpList } = this.reducerDpList(status, functions)
+    console.log(status, functions);
+    const {
+      roDpList,
+      rwDpList
+    } = this.reducerDpList(status, functions)
 
     // 获取头部展示功能点信息
     let titleItem = {
@@ -65,7 +87,16 @@ Page({
     const isRoDpListShow = Object.keys(roDpList).length > 0
     const isRwDpListShow = Object.keys(rwDpList).length > 0
 
-    this.setData({ titleItem, roDpList, rwDpList, device_name: name, isRoDpListShow, isRwDpListShow, roDpListLength, icon })
+    this.setData({
+      titleItem,
+      roDpList,
+      rwDpList,
+      device_name: name,
+      isRoDpListShow,
+      isRwDpListShow,
+      roDpListLength,
+      icon
+    })
   },
 
   // 分离只上报功能点，可上报可下发功能点
@@ -75,7 +106,10 @@ Page({
     let rwDpList = {};
     if (status && status.length) {
       status.map((item) => {
-        const { code, value } = item;
+        const {
+          code,
+          value
+        } = item;
         let isExit = functions.find(element => element.code == code);
         if (isExit) {
           let rightvalue = value
@@ -100,21 +134,38 @@ Page({
         }
       });
     }
-    return { roDpList, rwDpList }
+    return {
+      roDpList,
+      rwDpList
+    }
   },
 
   sendDp: async function (e) {
-    const { dpCode, value } = e.detail
-    const { device_id } = this.data
+    const {
+      dpCode,
+      value
+    } = e.detail
+    const {
+      device_id
+    } = this.data
 
-    const { success } = await deviceControl(device_id, dpCode, value)
+    const {
+      success
+    } = await deviceControl(device_id, dpCode, value)
   },
 
   updateStatus: function (newStatus) {
-    let { roDpList, rwDpList, titleItem } = this.data
+    let {
+      roDpList,
+      rwDpList,
+      titleItem
+    } = this.data
 
     newStatus.forEach(item => {
-      const { code, value } = item
+      const {
+        code,
+        value
+      } = item
 
       if (typeof roDpList[code] !== 'undefined') {
         roDpList[code]['value'] = value;
@@ -131,15 +182,43 @@ Page({
       let keys = Object.keys(rwDpList)[0];
       titleItem = rwDpList[keys];
     }
- 
-    this.setData({ titleItem, roDpList: { ...roDpList }, rwDpList: { ...rwDpList } })
+
+    this.setData({
+      titleItem,
+      roDpList: {
+        ...roDpList
+      },
+      rwDpList: {
+        ...rwDpList
+      }
+    })
   },
 
-  jumpTodeviceEditPage: function(){
+  jumpTodeviceEditPage: function () {
     console.log('jumpTodeviceEditPage')
-    const { icon, device_id, device_name } = this.data
+    const {
+      icon,
+      device_id,
+      device_name
+    } = this.data
     wx.navigateTo({
       url: `/pages/home_center/device_manage/index?device_id=${device_id}&device_name=${device_name}&device_icon=${icon}`,
     })
+  },
+
+  async switchTap() {
+    const {
+      device_id,
+      switchStatus,
+      rwDpList
+    } = this.data
+    const res = await deviceControl(device_id, 'switch', !rwDpList.switch.value)
+    if (res.success) {
+      this.setData({
+        'rwDpList.switch.value': !rwDpList.switch.value
+      })
+    }
+    // const res = await deviceControl(device_id, 'switch_led', true)
+    console.log(res);
   }
 })
